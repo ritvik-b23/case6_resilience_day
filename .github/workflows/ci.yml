@@ -1,0 +1,46 @@
+name: CI
+
+on:
+  push:
+    branches: ["**"]
+  pull_request:
+    branches: ["**"]
+
+jobs:
+  lint-and-test:
+    name: Lint and Test
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install orders-service dependencies
+        working-directory: services/orders-service
+        run: pip install -r requirements.txt
+
+      - name: Install inventory-service dependencies
+        working-directory: services/inventory-service
+        run: pip install -r requirements.txt
+
+      - name: Lint orders-service with ruff
+        run: ruff check services/orders-service/app
+
+      - name: Lint inventory-service with ruff
+        run: ruff check services/inventory-service/app
+
+      - name: Run orders-service tests
+        working-directory: services/orders-service
+        run: pytest tests/ -v
+
+      - name: Run inventory-service tests
+        working-directory: services/inventory-service
+        run: pytest tests/ -v
+
+      - name: Validate Docker Compose config
+        run: docker compose config --quiet

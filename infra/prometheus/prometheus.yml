@@ -1,0 +1,14 @@
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+
+scrape_configs:
+  - job_name: "orders-service"
+    static_configs:
+      - targets: ["orders-service:8001"]
+    metrics_path: /metrics
+
+  - job_name: "inventory-service"
+    static_configs:
+      - targets: ["inventory-service:8002"]
+    metrics_path: /metrics
